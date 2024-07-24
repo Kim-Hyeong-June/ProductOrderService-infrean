@@ -39,6 +39,5 @@ public abstract class Item {
         }
         this.stockQuantity = restStock;
     }
-
 }
 
