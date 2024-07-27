@@ -13,18 +13,27 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemService {
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
     @Transactional
-    public void save(Item item) {
+    public void saveItem(Item item) {
         itemRepository.save(item);
     }
 
-    public List<Item> finItems(){
+    public List<Item> findItems(){
         return itemRepository.findAll();
     }
 
     public Item findOne(Long itemId){
         return itemRepository.findOne(itemId);
     }
+
+    @Transactional
+    public void updateItem(Long id , String name , int price , int stockQuantity){
+        Item item = itemRepository.findOne(id);
+        item.setName(name);
+        item.setPrice(price);
+        item.setStockQuantity(stockQuantity);
+    }
+
 }

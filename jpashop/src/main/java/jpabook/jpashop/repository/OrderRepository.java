@@ -1,10 +1,12 @@
 package jpabook.jpashop.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.Order;
-import jpabook.jpashop.domain.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.stereotype.Repository;
@@ -27,7 +29,7 @@ public class OrderRepository {
         return em.find(Order.class, id);
     }
 
-    public List<Order> findAllByCriteria(OrderSearch orderSearch)
+    public List<Order> findAll(OrderSearch orderSearch)
     {
         CriteriaBuilder cb = em.getCriteriaBuilder();
 
@@ -49,5 +51,30 @@ public class OrderRepository {
         cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000);
         return query.getResultList();
+    }
+
+    public List<Order> findAll2(OrderSearch orderSearch)
+    {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QOrder order = QOrder.order;
+        QMember member = QMember.member;
+
+        BooleanExpression statusCondition = getStatusCondition(orderSearch.getOrderStatus(), order);
+        BooleanExpression nameCondition = getNameCondition(orderSearch.getMemberName(), member);
+
+        return queryFactory
+                .selectFrom(order)
+                .join(order.member, member)
+                .where(statusCondition, nameCondition)
+                .limit(1000)
+                .fetch();
+    }
+
+    private BooleanExpression getStatusCondition(OrderStatus status, QOrder order) {
+        return status != null ? order.status.eq(status) : null;
+    }
+
+    private BooleanExpression getNameCondition(String memberName, QMember member) {
+        return StringUtils.hasText(memberName) ? member.name.containsIgnoreCase(memberName) : null;
     }
 }

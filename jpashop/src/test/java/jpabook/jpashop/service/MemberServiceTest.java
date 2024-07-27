@@ -44,4 +44,17 @@ class MemberServiceTest {
         assertThrows(IllegalStateException.class, () -> memberService.join(member2));
     }
 
+    @Test
+    void 회원_2명이상_체크() throws Exception {
+        //given
+        Member member1 = new Member();
+        member1.setName("kim");
+
+        Member member2 = new Member();
+        member2.setName("kim2");
+        //when
+        memberService.join(member1);
+        memberService.join(member2);
+        //then
+    }
 }

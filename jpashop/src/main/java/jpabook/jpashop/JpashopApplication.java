@@ -11,5 +11,4 @@ public class JpashopApplication {
 		hello.setData("hi@");
 		SpringApplication.run(JpashopApplication.class, args);
 	}
-
 }
